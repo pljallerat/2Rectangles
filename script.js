@@ -129,7 +129,7 @@ class Rectangle{
     }
 
     isInTheRectange(mouseX, mouseY){
-        if (mouseX > this.x - this.width * 0.5 && mouseX < this.x + this.width * 0.5 && mouseY > this.y - this.height * 0.5 && mouseY < this.y + this.height * 0.5) {
+        if (mouseX > this.x - Math.abs(this.width) * 0.5 && mouseX < this.x + Math.abs(this.width) * 0.5 && mouseY > this.y - Math.abs(this.height) * 0.5 && mouseY < this.y + Math.abs(this.height) * 0.5) {
             this.startX = mouse.x;
             this.startY = mouse.y;
             return true;
@@ -154,59 +154,103 @@ class Rectangle{
     resize(dx, dy){
         let newX = this.x;
         let newY = this.y;
-        let newWidth= this.width;
+        let newWidth = this.width;
+        let newHeight = this.height;
+
         switch (this.isResizingOn){
             case 0:
                 document.body.style.cursor = "nw-resize";
-                this.x -= dx / 2;
-                this.y -= dy / 2;
-                this.width += dx;
-                this.height += dy;
+                newX -= dx / 2;
+                newY -= dy / 2;
+                newWidth += dx;
+                newHeight += dy;
                 break;
             case 2:
                 document.body.style.cursor = "ne-resize";
-                this.x -= dx /2;
-                this.y -= dy / 2;
-                this.width -= dx;
-                this.height += dy;
+                newX -= dx /2;
+                newY -= dy / 2;
+                newWidth -= dx;
+                newHeight += dy;
                 break;
             case 4:
                 document.body.style.cursor = "se-resize";
-                this.x -= dx /2;
-                this.y -= dy / 2;
-                this.width -= dx;
-                this.height -= dy;
+                newX -= dx /2;
+                newY -= dy / 2;
+                newWidth -= dx;
+                newHeight -= dy;
                 break;
             case 6:
                 document.body.style.cursor = "sw-resize";
-                this.x -= dx / 2;
-                this.y -= dy / 2;
-                this.width += dx;
-                this.height -= dy;
+                newX -= dx / 2;
+                newY -= dy / 2;
+                newWidth += dx;
+                newHeight -= dy;
                 break;
             case 1:
                 document.body.style.cursor = "n-resize";
-                this.y -= dy / 2;
-                this.height += dy;
+                newY -= dy / 2;
+                newHeight += dy;
                 break;
             case 3:
                 document.body.style.cursor = "e-resize";
-                this.x -= dx /2;
-                this.width -= dx;
+                newX -= dx /2;
+                newWidth -= dx;
                 break;
             case 5:
                 document.body.style.cursor = "s-resize";
-                this.y -= dy / 2;
-                this.height -= dy;
+                newY -= dy / 2;
+                newHeight -= dy;
                 break;
             case 7:
                 document.body.style.cursor = "w-resize";
-                this.x -= dx / 2;
-                this.width += dx;
+                newX -= dx / 2;
+                newWidth += dx;
                 break
             default:
                 break;
         }
+
+        if (newX - Math.abs(newWidth) / 2 <= 0) {
+            let offset = -1 * (newX - Math.abs(newWidth) / 2);
+            if (newWidth > 0) newWidth -= offset;
+            else newWidth += offset
+            newX = newX + offset / 2;
+        }
+        
+        if(newX + Math.abs(newWidth) / 2 >= canvas.width) {
+            let offset = (newX + Math.abs(newWidth) / 2) - canvas.width;
+            if (newWidth > 0) newWidth -= offset;
+            else newWidth += offset;
+            newX = newX - offset / 2;
+        }
+
+        if(newY - Math.abs(newHeight) / 2 <= 0) {
+            let offset = -1 * (newY - Math.abs(newHeight) / 2);
+            if (newHeight > 0) newHeight -= offset;
+            else newHeight += offset
+            newY = newY + offset / 2;
+        }
+
+        if(newY + Math.abs(newHeight) / 2 >= canvas.height) {
+            let offset = (newY + Math.abs(newHeight) / 2) - canvas.height;
+            if (newHeight > 0) newHeight -= offset;
+            else newHeight += offset;
+            newY = newY - offset / 2;
+        }
+
+
+        this.x = newX;
+        this.y = newY;
+        this.width = newWidth;
+        this.height = newHeight;
+
+        /*
+        console.log("x: ", this.x);
+        console.log("y: ", this.y);
+        console.log("width: ", this.width);
+        console.log("height: ", this.height);
+        */
+
         this.drawOnFocus();     
     }
 }
