@@ -107,22 +107,26 @@ class Rectangle{
     move(dx, dy) {
         let newX = this.x - dx;
         let newY = this.y - dy;
-        if (newX - this.width / 2 <= 0 && dx > 0) {
+
+        // Prevent from moving the rectange out of the area
+        if (newX - Math.abs(this.width) / 2 <= 0 && dx > 0) {
             dx = 0;
-            this.x = this.width / 2;
+            this.x = Math.abs(this.width) / 2;
         }
-        if (newY - this.height / 2 <= 0 && dy > 0) {
+        if (newY - Math.abs(this.height) / 2 <= 0 && dy > 0) {
             dy = 0;
-            this.y = this.height/2
+            this.y = Math.abs(this.height) /2
         }
-        if (newX + this.width / 2 >= canvas.width && dx < 0) {
+        if (newX + Math.abs(this.width) / 2 >= canvas.width && dx < 0) {
             dx = 0;
-            this.x = canvas.width - this.width / 2;
+            this.x = canvas.width - Math.abs(this.width) / 2;
         }
-        if (newY + this.height / 2 >= canvas.height && dy < 0) {
+        if (newY + Math.abs(this.height) / 2 >= canvas.height && dy < 0) {
             dy = 0;
-            this.y = canvas.height - this.height / 2;
+            this.y = canvas.height - Math.abs(this.height) / 2;
         }
+
+        // Update position
         this.x -= dx;
         this.y -= dy;
         this.draw()
@@ -157,6 +161,7 @@ class Rectangle{
         let newWidth = this.width;
         let newHeight = this.height;
 
+        // update compute the new size and position
         switch (this.isResizingOn){
             case 0:
                 document.body.style.cursor = "nw-resize";
@@ -210,6 +215,7 @@ class Rectangle{
                 break;
         }
 
+        // Prevent the rectange to be resize out of the left border
         if (newX - Math.abs(newWidth) / 2 <= 0) {
             let offset = -1 * (newX - Math.abs(newWidth) / 2);
             if (newWidth > 0) newWidth -= offset;
@@ -217,6 +223,7 @@ class Rectangle{
             newX = newX + offset / 2;
         }
         
+        // Prevent the rectange to be resize out of the right border
         if(newX + Math.abs(newWidth) / 2 >= canvas.width) {
             let offset = (newX + Math.abs(newWidth) / 2) - canvas.width;
             if (newWidth > 0) newWidth -= offset;
@@ -224,6 +231,7 @@ class Rectangle{
             newX = newX - offset / 2;
         }
 
+        // Prevent the rectange to be resize out of the top border
         if(newY - Math.abs(newHeight) / 2 <= 0) {
             let offset = -1 * (newY - Math.abs(newHeight) / 2);
             if (newHeight > 0) newHeight -= offset;
@@ -231,6 +239,7 @@ class Rectangle{
             newY = newY + offset / 2;
         }
 
+        // Prevent the rectange to be resize out of the bottom border
         if(newY + Math.abs(newHeight) / 2 >= canvas.height) {
             let offset = (newY + Math.abs(newHeight) / 2) - canvas.height;
             if (newHeight > 0) newHeight -= offset;
@@ -238,18 +247,11 @@ class Rectangle{
             newY = newY - offset / 2;
         }
 
-
+        // Update size and position
         this.x = newX;
         this.y = newY;
         this.width = newWidth;
         this.height = newHeight;
-
-        /*
-        console.log("x: ", this.x);
-        console.log("y: ", this.y);
-        console.log("width: ", this.width);
-        console.log("height: ", this.height);
-        */
 
         this.drawOnFocus();     
     }
@@ -270,32 +272,13 @@ function distanceMouseToCenter(rectangle) {
     return Math.sqrt(Math.pow(mouse.x - rectangle.x, 2) + Math.pow(mouse.y - rectangle.y, 2))
 }
 
-function isInArea(rectange, newX, newY, newWidth, newHeight) {
-    
-    if (newX - this.width / 2 <= 0 && dx > 0) {
-        dx = 0;
-        this.x = this.width / 2;
-    }
-    if (newY - this.height / 2 <= 0 && dy > 0) {
-        dy = 0;
-        this.y = this.height/2
-    }
-    if (newX + this.width / 2 >= canvas.width && dx < 0) {
-        dx = 0;
-        this.x = canvas.width - this.width / 2;
-    }
-    if (newY + this.height / 2 >= canvas.height && dy < 0) {
-        dy = 0;
-        this.y = canvas.height - this.height / 2;
-    }
-}
-
 function isRectangeOverlaping(rect1){
     const { x, y, width, height } = rect1;
     let overlap = false;
     rectangles.forEach((rect2) => {
         if (rect1 != rect2) {
-            if (Math.abs(x - rect2.x) < width/2 + rect2.width/2 && Math.abs(y - rect2.y) < height/2 + rect2.height/2) {
+            if (Math.abs(x - rect2.x) < Math.abs(width) / 2 + Math.abs(rect2.width) / 2 &&
+             Math.abs(y - rect2.y) < Math.abs(height) / 2 + Math.abs(rect2.height / 2)) {
                 overlap = true;
                 indexRec2 = rectangles.indexOf(rect2)
                 if (!rect2.onFocus && rect1.onFocus && indexRec2 != 0) {
