@@ -105,6 +105,24 @@ class Rectangle{
     }
 
     move(dx, dy) {
+        let newX = this.x - dx;
+        let newY = this.y - dy;
+        if (newX - this.width / 2 <= 0 && dx > 0) {
+            dx = 0;
+            this.x = this.width / 2;
+        }
+        if (newY - this.height / 2 <= 0 && dy > 0) {
+            dy = 0;
+            this.y = this.height/2
+        }
+        if (newX + this.width / 2 >= canvas.width && dx < 0) {
+            dx = 0;
+            this.x = canvas.width - this.width / 2;
+        }
+        if (newY + this.height / 2 >= canvas.height && dy < 0) {
+            dy = 0;
+            this.y = canvas.height - this.height / 2;
+        }
         this.x -= dx;
         this.y -= dy;
         this.draw()
@@ -134,6 +152,9 @@ class Rectangle{
     }
 
     resize(dx, dy){
+        let newX = this.x;
+        let newY = this.y;
+        let newWidth= this.width;
         switch (this.isResizingOn){
             case 0:
                 document.body.style.cursor = "nw-resize";
@@ -205,17 +226,37 @@ function distanceMouseToCenter(rectangle) {
     return Math.sqrt(Math.pow(mouse.x - rectangle.x, 2) + Math.pow(mouse.y - rectangle.y, 2))
 }
 
+function isInArea(rectange, newX, newY, newWidth, newHeight) {
+    
+    if (newX - this.width / 2 <= 0 && dx > 0) {
+        dx = 0;
+        this.x = this.width / 2;
+    }
+    if (newY - this.height / 2 <= 0 && dy > 0) {
+        dy = 0;
+        this.y = this.height/2
+    }
+    if (newX + this.width / 2 >= canvas.width && dx < 0) {
+        dx = 0;
+        this.x = canvas.width - this.width / 2;
+    }
+    if (newY + this.height / 2 >= canvas.height && dy < 0) {
+        dy = 0;
+        this.y = canvas.height - this.height / 2;
+    }
+}
+
 function isRectangeOverlaping(rect1){
     const { x, y, width, height } = rect1;
     let overlap = false;
     rectangles.forEach((rect2) => {
         if (rect1 != rect2) {
             if (Math.abs(x - rect2.x) < width/2 + rect2.width/2 && Math.abs(y - rect2.y) < height/2 + rect2.height/2) {
-                if (!rect2.onFocus) {
-                    indexRec2 = rectangles.indexOf(rect2)
+                overlap = true;
+                indexRec2 = rectangles.indexOf(rect2)
+                if (!rect2.onFocus && rect1.onFocus && indexRec2 != 0) {
                     swap(0, indexRec2, rectangles)
                     rectangles[0].draw()
-                    overlap = true;
                 }   
             }
         }
