@@ -351,19 +351,23 @@ function swap(indexElement1, indexElement2, array) {
 }
 
 /**
- * Update the notification message on the html page.
+ * Update the notification message on the html page with a message
+ * depending if there is an overlap
  * 
- * @param {*} text text to display in the notification
+ * @param {*} isOverlaping true if 2 rectangles overlap, else false 
  */
-function notify(text) {
-    let elm = document.getElementById('notification').getElementsByTagName("p")[0];
-    elm.innerText = text
-    /*
-    let img = document.getElementById('notification').getElementsByTagName("img")[0]
-    let visible = false;
-    if (text != "") visible = true
-    img.style.display = (visible ? 'block' : 'none');
-    */
+function notifyOverlaping(isOverlaping) {
+    let elm = document.getElementById('notification');
+    let img = document.getElementById('righ-corner').getElementsByTagName("img")[0]
+    if (isOverlaping) {
+        elm.style.color = "#ffcc00"
+        elm.innerText = "The rectangles are overlaping"
+        img.style.display = "block";
+    } else {
+        elm.style.color = "#EEE"
+        elm.innerText = ""
+        img.style.display = "none";
+    }
 }
 
 /**
@@ -409,12 +413,12 @@ function isRectangeOverlap(rectangle1){
  */
 function animate() {
     requestAnimationFrame(animate);
-    let notifyOverlaping = false;
+    let overlap = false;
 
     c.clearRect(0,0, canvas.width, canvas.height);
 
     rectangles.forEach((rectangle) => {
-        notifyOverlaping = isRectangeOverlap(rectangle)
+        overlap = isRectangeOverlap(rectangle)
 
         if (rectangle.onFocus) {
             // Get the difference of mouse's positiosn between 2 itirations to get the mouvement of the mouse
@@ -439,8 +443,7 @@ function animate() {
         }
         
     });
-    if (notifyOverlaping) notify("Notification: The rectangles are overlap")
-    else notify("")
+    notifyOverlaping(overlap);
 }
 
 // Setup the canvas

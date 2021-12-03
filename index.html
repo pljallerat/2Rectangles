@@ -19,29 +19,42 @@
             }
 
             #title {
-                padding: auto;
                 color: #EEE;
                 font-family: Arial;
-                display: inline-block;
-                margin-left: 10%;
+                display: flex;
+                flex-direction: row;
             }
-            #notification{
-                display: inline-block;
+            h1 {
                 margin-left: 10%;
+                margin-top: 0.5%;
+                margin-bottom: 0.5%;
+            }
+
+            #righ-corner{
+                display: flex;
+                flex-direction: row;
+                margin-right: auto;
+                margin-left: auto;
             }
             
-            #notification p{
+            #textBox{
+                margin-left: 5%;
                 display: inline-block;
+            }
+
+            #instruction {
                 color: #EEE;
                 font-family: Arial;
+                margin-top: 0%;
+                margin-bottom: 1%;
             }
 
             img {
                 display: inline-block;
                 padding: 0%;
                 display: none;
-                max-width: 10%;
-                max-height: 10%;
+                max-width: 40px;
+                max-height: 40px;
             }
         </style>
     </head>
@@ -49,10 +62,14 @@
         <div id="header">
             <div id ="title">
                 <h1>Coding Exercice</h1>
+                <div id="righ-corner">
+                    <img src="warning.png" style="display: none;">
+                    <p id=notification></p> 
+                </div>
+                <p style="margin-right: 2%;">Author: Pierre-Louis JALLERAT</p>  
             </div>
-            <div id="notification">
-                <!-- <img src="warning.png" style="display: none;">-->
-                <p></p>    
+            <div id="textBox">
+                <p id="instruction">User guide: To move a rectange use drap & drop. To resize a rectangle, first click on it, then use drag and drop on one of the circles located on the boundaries</p>
             </div>
         </div>
         <canvas id=canvas></canvas>
