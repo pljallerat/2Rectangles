@@ -346,7 +346,7 @@ class Rectangle{
  */
 function swap(indexElement1, indexElement2, array) {
     const buff = array[indexElement1];
-    array[0] = array[indexElement2];
+    array[indexElement1] = array[indexElement2];
     array[indexElement2] = buff;
 }
 
@@ -387,16 +387,17 @@ function isRectangeOverlap(rectangle1){
             */
             if (Math.abs(x - rectangle2.x) < Math.abs(width) / 2 + Math.abs(rectangle2.width) / 2 &&
              Math.abs(y - rectangle2.y) < Math.abs(height) / 2 + Math.abs(rectangle2.height / 2)) {
-                overlap = true;
-                // If there is an overlap and the rectangle which has the focus is not on the foreground, we move it to the foreground
-                indexRectangle2 = rectangles.indexOf(rectangle2)
-                if (!rectangle2.onFocus && rectangle1.onFocus && indexRectangle2 != 0) {
-                    swap(0, indexRectangle2, rectangles) // The first rectangle on the array is drawn on the foreground
-                    rectangles[0].draw()
-                }   
+                overlap = true; 
             }
         }
     });
+    // If there is an overlap and the rectangle which has the focus is not on the foreground, we move it to the foreground
+    let lastIndex = rectangles.length - 1;
+    indexRectangle1 = rectangles.indexOf(rectangle1)
+    if (rectangle1.onFocus && indexRectangle1 != lastIndex) {
+        swap(lastIndex, indexRectangle1, rectangles) // The last rectangle in the array is the one drawn on the foreground
+        rectangles[lastIndex].draw()
+    }  
     return overlap
 }
 
@@ -465,9 +466,11 @@ var colourPalette = {
 
 // Contains the rectangles to display
 var rectangles = []
-rectangles.push(new Rectangle(300, 400, 150, 200, colourPalette.red));
 
+// The 2 rectangles which are going to display. Feel free to add more if you want.
+rectangles.push(new Rectangle(300, 400, 150, 200, colourPalette.red));
 rectangles.push(new Rectangle(200, 150, 150, 100, colourPalette.blue));
+
 
 rectangles.forEach((rectangle) => {
     rectangle.draw();
