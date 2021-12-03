@@ -1,8 +1,12 @@
 /*
-The following program contains a source code for simple web application.
+@Author: Pierre-Louis JALLERAT
+Date : 03/12/2021
+
+The following program contains a source code of web page with an animation.
 It displays 2 rectangles. They can be move and resize within the window.
 If the rectangles overlap, the user is notified.
 */
+
 
 // When the mouse move, update the position of the object mouse and manage the offset due to the canvas
 window.addEventListener('mousemove', function(event) {
@@ -151,22 +155,22 @@ class Rectangle{
 
         // Prevent from moving the rectange out of the window
 
-        // Prevent to move on the other side of the left boundary
+        // Prevent movement across the left border
         if (newX - Math.abs(this.width) / 2 <= 0 && dx > 0) {
             dx = 0;
             this.x = Math.abs(this.width) / 2;
         }
-        // Prevent to move on the other side of the top boundary
+        // Prevent movement across the top border 
         if (newY - Math.abs(this.height) / 2 <= 0 && dy > 0) {
             dy = 0;
             this.y = Math.abs(this.height) /2
         }
-        // Prevent to move on the other side of the right boundary
+        // Prevent movement across the right border
         if (newX + Math.abs(this.width) / 2 >= canvas.width && dx < 0) {
             dx = 0;
             this.x = canvas.width - Math.abs(this.width) / 2;
         }
-        // Prevent to move on the other side of the bittom boundary
+        // Prevent movement across the bottom border
         if (newY + Math.abs(this.height) / 2 >= canvas.height && dy < 0) {
             dy = 0;
             this.y = canvas.height - Math.abs(this.height) / 2;
