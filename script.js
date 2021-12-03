@@ -252,50 +252,42 @@ class Rectangle{
         */
         switch (this.isResizingOn){
             case 0: // top left
-                document.body.style.cursor = "nw-resize";
                 newX -= dx / 2;
                 newY -= dy / 2;
                 newWidth += dx;
                 newHeight += dy;
                 break;
             case 2: // top right
-                document.body.style.cursor = "ne-resize";
                 newX -= dx /2;
                 newY -= dy / 2;
                 newWidth -= dx;
                 newHeight += dy;
                 break;
             case 4: // bottom right
-                document.body.style.cursor = "se-resize";
                 newX -= dx /2;
                 newY -= dy / 2;
                 newWidth -= dx;
                 newHeight -= dy;
                 break;
             case 6: // bottom left
-                document.body.style.cursor = "sw-resize";
                 newX -= dx / 2;
                 newY -= dy / 2;
                 newWidth += dx;
                 newHeight -= dy;
                 break;
             case 1: // middle top
-                document.body.style.cursor = "n-resize";
                 newY -= dy / 2;
                 newHeight += dy;
                 break;
             case 3: //middle right
-                document.body.style.cursor = "e-resize";
                 newX -= dx /2;
                 newWidth -= dx;
                 break;
             case 5: //middle bot
-                document.body.style.cursor = "s-resize";
                 newY -= dy / 2;
                 newHeight -= dy;
                 break;
             case 7: // middle left
-                document.body.style.cursor = "w-resize";
                 newX -= dx / 2;
                 newWidth += dx;
                 break
