@@ -1,41 +1,48 @@
-// When the mouse move we update the position of the mouse and manage the offset due to the canvas
+/*
+The following program contains a source code for simple web application.
+It displays 2 rectangles. They can be move and resize within the window.
+If the rectangles overlap, the user is notified.
+*/
+
+// When the mouse move, update the position of the object mouse and manage the offset due to the canvas
 window.addEventListener('mousemove', function(event) {
     event.preventDefault();
     mouse.x = event.x - canvas.getBoundingClientRect().x;
     mouse.y = event.y - canvas.getBoundingClientRect().y;
 });
 
-/* 
-When the mouse is down (ie. the user does a "click"), we check on each rectangle if the user want to move a rectangle or resize a rectange
-*/
+ 
+//When the mouse is down, check on each rectangle if the user want to move or resize a rectangle
 window.addEventListener('mousedown', function(event) {
     event.preventDefault();
     mouseX = event.x - canvas.getBoundingClientRect().x;
     mouseY = event.y - canvas.getBoundingClientRect().y;
 
-    // In case of an overlap, only the element on the top has the focus
+    /* 
+    In case of an overlap, only the rectangle on the top has the focus
+    The other(s) won't be able to be moved and resized
+    */
     let oneElementHasFocus = false;
 
     for(let i = rectangles.length - 1; i >=0; i--) {
-
-        // First, check if the user want to resize an element
-        rectangles[i].isInAHitBox(mouseX, mouseY) // isInAHitBox() update the value isResizingOn. If it is -1 the user is not trying to resize
-        // If one element has already the focus, the others elements can't have the focus. This prevent to have 2 elements resizing in the same time.
+        /*
+        Firt, check if the user try the resize a rectange
+        isInAHitBox() updates the value isResizingOn. If it is -1 the user is not trying to resize
+        */
+        rectangles[i].isInAHitBox(mouseX, mouseY)
         if (!oneElementHasFocus && rectangles[i].isResizingOn != -1) {
             rectangles[i].onFocus = true;
             oneElementHasFocus = true;
-
-            //rectangles[i].initialDistance = distanceMouseToCenter(rectangles[i])
         } else
-        // Then, we check if the user want to drag an element
-        // If one element has already the focus, the others elements can't have the focus. This prevent to have 2 elements moving in the same time.
+
+        // Then, check if the user want to drag an element
         if(!oneElementHasFocus && rectangles[i].isInTheRectange(mouseX, mouseY)) {
             document.body.style.cursor = "move";
             rectangles[i].isDragagging = true;
             rectangles[i].onFocus = true;
             oneElementHasFocus = true;
         }
-        // The user is nit trying to move a rectange or resize it, we set the corresponding parameter to false (or -1)
+        // The user is not trying to move or resize the rectange, we set the corresponding parameter to false (or -1)
         else{
             rectangles[i].isDragagging = false;
             rectangles[i].onFocus = false;
@@ -46,10 +53,10 @@ window.addEventListener('mousedown', function(event) {
 
 });
 
-// If the mouse is up, the moving or the resizing action is stop so we set the corresponding parameter to false (or -1)
+// If the mouse is up, moving or resizing actions are stop and we set the corresponding parameters to false (or -1)
 window.addEventListener('mouseup', function(event) {
     event.preventDefault();
-    rectangles.forEach((rectangle) => { 
+    rectangles.forEach((rectangle) => {
         rectangle.isDragagging = false;
         rectangle.isResizingOn = -1;
     });
@@ -57,25 +64,49 @@ window.addEventListener('mouseup', function(event) {
 });
 
 
+/**
+ * Rectangle Class
+ * A rectangle can be move or resize.
+ * To move a rectangle, the user has to do a drag and drop
+ * To resize a rectange, the user has first to click on the rectange. Once it has the focus, 8 circles (hitboxes) are drew on the boundaries.
+ * If the user click on one of the circle (hitbox), he can resize the rectange by moving is mouse.
+ * 
+ */
 class Rectangle{
+    /**
+     * Contructor of the class
+     * 
+     * @param {*} x X coordinate of the rectange's center 
+     * @param {*} y Y coordinate of the rectange's center
+     * @param {*} width initial width 
+     * @param {*} height initial height 
+     * @param {*} colour initial color
+     */
     constructor(x, y, width, height, colour) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
+        /*
+        Once a rectange has the focus, it can be drag or resize (not both in the same time)
+        A rectangle can have the focus but not being drag or resize   
+        */     
         this.isDragagging = false;
         this.isResizingOn = -1; // The numero of the hitbox use to resize, if no hitbox is hit, the value is set to 1
         this.onFocus = false;
+
         this.mainColour = colour.main;
         this.focusColour = colour.focus;
-        this.hitBoxesOnShape = [];
+        this.hitBoxesOnShape = []; // Contains the 8 circles drawn when the rectangle has the focus 
         this.hitBoxesRadius = 7;
-        // initial position of the mouse when you start the drap and drop
+        // initial position of the mouse when you start the dragging/resizing
         this.startX = 0;
         this.startY = 0;
-        this.initialDistance = 0; // initial distance between the mouse and the center of a rectangle when you start resizing
     }
 
+    /**
+     * Draw the rectangle in the canvas
+     */
     draw() {
         c.beginPath();
         c.rect(this.x - this.width * 0.5, this.y - this.height * 0.5, this.width, this.height);
@@ -84,6 +115,10 @@ class Rectangle{
         c.closePath();
     }
 
+    /**
+     * Function call the draw the rectangle which has the foxus
+     * Draw the rectange and the 8 circles around its boundaries
+     */
     drawOnFocus() {
         this.draw();
         this.hitBoxesOnShape = [[this.x - this.width / 2, this.y - this.height / 2], // top left corner
@@ -104,23 +139,34 @@ class Rectangle{
         });
     }
 
+    /**
+     * Move the rectangle according to mouvement of the mouse
+     * 
+     * @param {*} dx movement of the mouse in the axis-X
+     * @param {*} dy movement of the mouse in the axis-Y
+     */
     move(dx, dy) {
         let newX = this.x - dx;
         let newY = this.y - dy;
 
-        // Prevent from moving the rectange out of the area
+        // Prevent from moving the rectange out of the window
+
+        // Prevent to move on the other side of the left boundary
         if (newX - Math.abs(this.width) / 2 <= 0 && dx > 0) {
             dx = 0;
             this.x = Math.abs(this.width) / 2;
         }
+        // Prevent to move on the other side of the top boundary
         if (newY - Math.abs(this.height) / 2 <= 0 && dy > 0) {
             dy = 0;
             this.y = Math.abs(this.height) /2
         }
+        // Prevent to move on the other side of the right boundary
         if (newX + Math.abs(this.width) / 2 >= canvas.width && dx < 0) {
             dx = 0;
             this.x = canvas.width - Math.abs(this.width) / 2;
         }
+        // Prevent to move on the other side of the bittom boundary
         if (newY + Math.abs(this.height) / 2 >= canvas.height && dy < 0) {
             dy = 0;
             this.y = canvas.height - Math.abs(this.height) / 2;
@@ -132,6 +178,13 @@ class Rectangle{
         this.draw()
     }
 
+    /**
+     * Check if the mouse position is inside a rectange
+     * 
+     * @param {*} mouseX position of the mouse in the axis-X
+     * @param {*} mouseY position of the mouse in the axis-Y
+     * @returns 
+     */
     isInTheRectange(mouseX, mouseY){
         if (mouseX > this.x - Math.abs(this.width) * 0.5 && mouseX < this.x + Math.abs(this.width) * 0.5 && mouseY > this.y - Math.abs(this.height) * 0.5 && mouseY < this.y + Math.abs(this.height) * 0.5) {
             this.startX = mouse.x;
@@ -142,6 +195,14 @@ class Rectangle{
         }
     }
 
+    /**
+     * Check if the mouse position is inside one of the 8 circles of the focus rectangle
+     * If yes, the function update this.isResizingOn with the numero of the circle hit by the user click
+     * If no, this.isResizingOn = -1
+     * 
+     * @param {*} mouseX position of the mouse in the axis-X
+     * @param {*} mouseY position of the mouse in the axis-Y
+     */
     isInAHitBox(mouseX, mouseY){    
         let hitNumber = -1;
         for (let i = 0; i < this.hitBoxesOnShape.length; i++) {
@@ -155,58 +216,70 @@ class Rectangle{
         this.isResizingOn = hitNumber;
     }
 
+
+    /**
+     * Resize the rectangle according to mouvement of the mouse.
+     * The way a rectange is resize depend on the hitbox the user clicks on.
+     * Each hitbox (or circle) is manage differently.
+     * 
+     * @param {*} dx movement of the mouse in the axis-X
+     * @param {*} dy movement of the mouse in the axis-Y
+     */
     resize(dx, dy){
         let newX = this.x;
         let newY = this.y;
         let newWidth = this.width;
         let newHeight = this.height;
 
-        // update compute the new size and position
+        /*
+        Compute the possible new size and position.
+        this.isResizingOn correspond to the numero of the hitbox the user clicks on
+        */
         switch (this.isResizingOn){
-            case 0:
+            case 0: // top left
                 document.body.style.cursor = "nw-resize";
                 newX -= dx / 2;
                 newY -= dy / 2;
                 newWidth += dx;
                 newHeight += dy;
                 break;
-            case 2:
+            case 2: // top right
                 document.body.style.cursor = "ne-resize";
                 newX -= dx /2;
                 newY -= dy / 2;
                 newWidth -= dx;
                 newHeight += dy;
                 break;
-            case 4:
+            case 4: // bottom right
                 document.body.style.cursor = "se-resize";
                 newX -= dx /2;
                 newY -= dy / 2;
                 newWidth -= dx;
                 newHeight -= dy;
                 break;
-            case 6:
+            case 6: // bottom left
                 document.body.style.cursor = "sw-resize";
                 newX -= dx / 2;
                 newY -= dy / 2;
                 newWidth += dx;
                 newHeight -= dy;
                 break;
-            case 1:
+            case 1: // middle top
                 document.body.style.cursor = "n-resize";
                 newY -= dy / 2;
                 newHeight += dy;
                 break;
-            case 3:
+            case 3: //middle right
                 document.body.style.cursor = "e-resize";
                 newX -= dx /2;
                 newWidth -= dx;
                 break;
-            case 5:
+            case 5: //middle bot
                 document.body.style.cursor = "s-resize";
                 newY -= dy / 2;
                 newHeight -= dy;
                 break;
-            case 7:
+            case 7: // middle left
                 document.body.style.cursor = "w-resize";
                 newX -= dx / 2;
                 newWidth += dx;
@@ -215,7 +288,10 @@ class Rectangle{
                 break;
         }
 
-        // Prevent the rectange to be resize out of the left border
+
+        // Correct the new values x, y, width and height if they are out of the windows
+
+        // Prevent the rectange to be resize on the other side of the left boundary
         if (newX - Math.abs(newWidth) / 2 <= 0) {
             let offset = -1 * (newX - Math.abs(newWidth) / 2);
             if (newWidth > 0) newWidth -= offset;
@@ -223,7 +299,7 @@ class Rectangle{
             newX = newX + offset / 2;
         }
         
-        // Prevent the rectange to be resize out of the right border
+        // Prevent the rectange to be resize on the other side of the right boundary
         if(newX + Math.abs(newWidth) / 2 >= canvas.width) {
             let offset = (newX + Math.abs(newWidth) / 2) - canvas.width;
             if (newWidth > 0) newWidth -= offset;
@@ -231,7 +307,7 @@ class Rectangle{
             newX = newX - offset / 2;
         }
 
-        // Prevent the rectange to be resize out of the top border
+        // Prevent the rectange to be resize on the other side of the top boundary
         if(newY - Math.abs(newHeight) / 2 <= 0) {
             let offset = -1 * (newY - Math.abs(newHeight) / 2);
             if (newHeight > 0) newHeight -= offset;
@@ -239,7 +315,7 @@ class Rectangle{
             newY = newY + offset / 2;
         }
 
-        // Prevent the rectange to be resize out of the bottom border
+        // Prevent the rectange to be resize on the other side of the bottom boundary
         if(newY + Math.abs(newHeight) / 2 >= canvas.height) {
             let offset = (newY + Math.abs(newHeight) / 2) - canvas.height;
             if (newHeight > 0) newHeight -= offset;
@@ -247,7 +323,7 @@ class Rectangle{
             newY = newY - offset / 2;
         }
 
-        // Update size and position
+        // Update size and position after correct
         this.x = newX;
         this.y = newY;
         this.width = newWidth;
@@ -257,32 +333,61 @@ class Rectangle{
     }
 }
 
-function swap(indexElm1, indexElm2, array) {
-    const buff = array[indexElm1];
-    array[0] = array[indexElm2];
-    array[indexElm2] = buff;
+/**
+ * Swap the position of 2 elements in a list
+ * 
+ * @param {*} indexElement1 index of the first element
+ * @param {*} indexElement2 index of the second element
+ * @param {*} array 
+ */
+function swap(indexElement1, indexElement2, array) {
+    const buff = array[indexElement1];
+    array[0] = array[indexElement2];
+    array[indexElement2] = buff;
 }
 
+/**
+ * Update the notification message on the html page.
+ * 
+ * @param {*} text text to display in the notification
+ */
 function notify(text) {
-    let elm = document.getElementById('notification');
-    elm.innerHTML = text
+    let elm = document.getElementById('notification').getElementsByTagName("p")[0];
+    elm.innerText = text
+    /*
+    let img = document.getElementById('notification').getElementsByTagName("img")[0]
+    let visible = false;
+    if (text != "") visible = true
+    img.style.display = (visible ? 'block' : 'none');
+    */
 }
 
-function distanceMouseToCenter(rectangle) {
-    return Math.sqrt(Math.pow(mouse.x - rectangle.x, 2) + Math.pow(mouse.y - rectangle.y, 2))
-}
-
-function isRectangeOverlaping(rect1){
-    const { x, y, width, height } = rect1;
+/**
+ * Check if a rectangle overlap with another rectangle. 
+ * To do that, we compare the positions, the width and height of each rectangle
+ * If the rectange overlap, and if it has the focus, we move the rectangle to the foreground (if it is not already)
+ * 
+ * @param {*} rectangle1 
+ * @returns true is the rectangle overlap with another rectangle else false
+ */
+function isRectangeOverlap(rectangle1){
+    const { x, y, width, height } = rectangle1;
     let overlap = false;
-    rectangles.forEach((rect2) => {
-        if (rect1 != rect2) {
-            if (Math.abs(x - rect2.x) < Math.abs(width) / 2 + Math.abs(rect2.width) / 2 &&
-             Math.abs(y - rect2.y) < Math.abs(height) / 2 + Math.abs(rect2.height / 2)) {
+
+    rectangles.forEach((rectangle2) => {
+        if (rectangle1 != rectangle2) {
+            /* To check if 2 rectangles overlap, we check the difference of their positions (x,y) 
+            Important reminder: (x, y) corresponds to the center of a rectangle
+            If the difference of positions x is inferior to the sum of the half of each of the widths
+            and the difference of positions y is inferior the the sum of the half of each of the heights: they overlap !
+            */
+            if (Math.abs(x - rectangle2.x) < Math.abs(width) / 2 + Math.abs(rectangle2.width) / 2 &&
+             Math.abs(y - rectangle2.y) < Math.abs(height) / 2 + Math.abs(rectangle2.height / 2)) {
                 overlap = true;
-                indexRec2 = rectangles.indexOf(rect2)
-                if (!rect2.onFocus && rect1.onFocus && indexRec2 != 0) {
-                    swap(0, indexRec2, rectangles)
+                // If there is an overlap and the rectangle which has the focus is not on the foreground, we move it to the foreground
+                indexRectangle2 = rectangles.indexOf(rectangle2)
+                if (!rectangle2.onFocus && rectangle1.onFocus && indexRectangle2 != 0) {
+                    swap(0, indexRectangle2, rectangles) // The first rectangle on the array is drawn on the foreground
                     rectangles[0].draw()
                 }   
             }
@@ -291,6 +396,12 @@ function isRectangeOverlaping(rect1){
     return overlap
 }
 
+/**
+ * The function iterate endlessy. We use it to update the rectangles at all times
+ * It start by clearing the canvas. Then it itirate throught an array of rectangles 
+ * and draw them depending on their states (focus, draging, resize or default)
+ * 
+ */
 function animate() {
     requestAnimationFrame(animate);
     let notifyOverlaping = false;
@@ -298,9 +409,10 @@ function animate() {
     c.clearRect(0,0, canvas.width, canvas.height);
 
     rectangles.forEach((rectangle) => {
-        notifyOverlaping = isRectangeOverlaping(rectangle)
+        notifyOverlaping = isRectangeOverlap(rectangle)
 
         if (rectangle.onFocus) {
+            // Get the difference of mouse's positiosn between 2 itirations to get the mouvement of the mouse
             var dx = rectangle.startX - mouse.x;
             var dy = rectangle.startY - mouse.y;
             if(rectangle.isDragagging == true) {
@@ -322,7 +434,7 @@ function animate() {
         }
         
     });
-    if (notifyOverlaping) notify("Overlapping")
+    if (notifyOverlaping) notify("Notification: The rectangles are overlap")
     else notify("")
 }
 
@@ -347,6 +459,7 @@ var colourPalette = {
     blue: { main: "#1133FF", focus: "#6688FF"},
 };
 
+// Contains the rectangles to display
 var rectangles = []
 rectangles.push(new Rectangle(300, 400, 150, 200, colourPalette.red));
 

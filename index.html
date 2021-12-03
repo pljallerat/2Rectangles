@@ -5,18 +5,55 @@
         <title>Apple Exercice</title>
         <style>
             #canvas{
-                border: solid 1px black;
-                }
+                border: solid 1px #EfEfEf;
+                background-color: #EfEfEf;
+            }
+            body {
+                margin: 0;
+            }
             #header{
-                display: flex;
-                margin-left: 20px;
+                width: 100%;
+                margin-right: 0;
+                background-color: #1abc9c;
+                height: 10%;
+            }
+
+            #title {
+                padding: auto;
+                color: #EEE;
+                font-family: Arial;
+                display: inline-block;
+                margin-left: 10%;
+            }
+            #notification{
+                display: inline-block;
+                margin-left: 10%;
+            }
+            
+            #notification p{
+                display: inline-block;
+                color: #EEE;
+                font-family: Arial;
+            }
+
+            img {
+                display: inline-block;
+                padding: 0%;
+                display: none;
+                max-width: 10%;
+                max-height: 10%;
             }
         </style>
     </head>
     <body>
         <div id="header">
-            <h1>Apple Exercice</h1>
-            <div id="notification"><p></p></div>
+            <div id ="title">
+                <h1>Apple Exercice</h1>
+            </div>
+            <div id="notification">
+                <!-- <img src="warning.png" style="display: none;">-->
+                <p></p>    
+            </div>
         </div>
         <canvas id=canvas></canvas>
         <script src="script.js"></script>
