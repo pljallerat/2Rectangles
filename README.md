@@ -7,7 +7,7 @@ If the rectangles overlap, the user is notified.
 To use the web page, open the html page on a browser.
 
 To move a rectangle, you can use "drag & drop" with your mouse/
-To risize a rectangle, first click on the rectangles you want to resize. Then use "drag & drop" one of the circle located on its borders.
+To resize a rectangle, first click on the rectangle you want to resize. Then use "drag & drop" on one of the circle located on its borders.
 
 The code was test on:
 * Microsoft Edge Version 96.0.1054.41
